@@ -92,7 +92,7 @@
             together with other annotation processors' below. -->
 					</annotationProcessorPaths>
 				</configuration>
-			l/plugin>
+			</plugin>
 		</plugins>
 	</build>
 
