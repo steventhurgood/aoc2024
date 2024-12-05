@@ -26,7 +26,13 @@ public class Day5Controller {
         var resource = (release.equals("prod") ? inputResource : testResource);
         var input = resource.getContentAsString(StandardCharsets.UTF_8);
         logger.info("Input: {} chars", input.length());
-        return null;
+        var parts = input.split("\n\n");
+        var spec = parts[0];
+        var pages = parts[1];
+        var comparator = PageComparator.fromString(spec);
+        var sorter = new PageSorter(comparator);
+        var sum = sorter.sumOfSortedlines(pages);
+        return sum;
     }
 
     @GetMapping("/day5/part2/{release}")
@@ -34,6 +40,12 @@ public class Day5Controller {
         var resource = (release.equals("prod") ? inputResource : testResource);
         var input = resource.getContentAsString(StandardCharsets.UTF_8);
         logger.info("Input: {} chars", input.length());
-        return null;
+        var parts = input.split("\n\n");
+        var spec = parts[0];
+        var pages = parts[1];
+        var comparator = PageComparator.fromString(spec);
+        var sorter = new PageSorter(comparator);
+        var sum = sorter.sumOfOfUnsortedLines(pages);
+        return sum;
     }
 }
