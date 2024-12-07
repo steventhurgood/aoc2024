@@ -1,10 +1,6 @@
 package org.nihilistic.aoc.day7;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class PlusTimesConcatVariantBuilder implements VariantBuilder {
-    private static Logger logger = LoggerFactory.getLogger(PlusTimesConcatVariantBuilder.class);
 
     @Override
     public NumberTree[] buildVariants(long[] numbers) {
