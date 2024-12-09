@@ -127,6 +127,23 @@ public record DiskMap(List<DiskAllocation> allocations) {
             }
             // nextFree now points to the leftmost free block
             // nextBlock now points to the rightmost block to defrag
+            var blocksToFill = nextFree.size();
+            var blocksToAllocate = nextBlock.size();
+
+            if (blocksToAllocate == blocksToFill) {
+                allocations.set(nextFree, currentFree.fill(currentDefrag.fileId()));
+                allocations.removeLast();
+            }
+            if (blocksToAllocate > blocksToFill) {
+                allocations.set(nextFree, currentFree.fill(currentDefrag.fileId()));
+                allocations.set(nextToDefrag, currentDefrag.shrink(blocksToAllocate - blocksToFill));
+            }
+            if (blocksToAllocate < blocksToFill) {
+                allocations.set(nextFree, currentFree.shrinkAndFill(currentDefrag.size(), currentDefrag.fileId()));
+                allocations.add(nextFree+1, currentFree.spaceAfterFilling(currentDefrag.size()));
+                allocations.removeLast();
+            }
+            while (allocations.getLast().free()) {
 
         }
 

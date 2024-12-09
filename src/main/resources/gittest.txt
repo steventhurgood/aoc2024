@@ -1,5 +1,0 @@
-This is some text.
-
-Then change the text.
-
-Then change the file some more
