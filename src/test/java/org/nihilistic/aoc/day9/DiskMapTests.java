@@ -86,8 +86,21 @@ public class DiskMapTests {
         // assert
 
         assertThat(actual).isEqualTo(1928);
+    }
 
+    @Test
+    public void testDiskMap_whenDefragWholeFiles_isCorrect() {
+        // arrange
+        String input = "2333133121414131402";
+        DiskMap diskMap = DiskMap.fromString(input);
+        var expected = "00992111777.44.333....5555.6666.....8888..";
 
+        // act
+        DiskMap actualMap = diskMap.defragWholeFile();
+        var actual = actualMap.toString();
 
+        // assert
+        assertThat(actual).isEqualTo(expected);
+        assertThat(actualMap.checksum()).isEqualTo(2858);
     }
 }

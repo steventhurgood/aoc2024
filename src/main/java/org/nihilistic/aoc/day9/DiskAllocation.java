@@ -21,5 +21,13 @@ public record DiskAllocation(int start, int end, int fileId, boolean free) {
     public DiskAllocation spaceAfterFilling(int size) {
         return new DiskAllocation(start+size, end, fileId, true);
     }
+
+    public DiskAllocation moveToOffset(int offset) {
+        return new DiskAllocation(offset, offset+size(), fileId, free);
+    }
+
+    public DiskAllocation makeFree() {
+        return new DiskAllocation(start, end, -1, true);
+    }
     
 }
