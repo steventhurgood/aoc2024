@@ -11,5 +11,4 @@ public class AocApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(AocApplication.class, args);
 	}
-
 }
