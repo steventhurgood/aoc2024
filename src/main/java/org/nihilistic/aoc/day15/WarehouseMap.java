@@ -1,8 +1,12 @@
 package org.nihilistic.aoc.day15;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public record WarehouseMap(Set<Coordinate> walls, Set<Coordinate> barrels, RobotAgent agent) {
@@ -57,8 +61,8 @@ public record WarehouseMap(Set<Coordinate> walls, Set<Coordinate> barrels, Robot
             Set<Coordinate> barrelsToMove = Sets.newHashSet(newAgentPosition);
             var newBarrelPosition = instruction.move(newAgentPosition);
             while (true) {
-                // #.@OO.#  -> #..@OO#
-                // #..@OO#  -> #..@OO#
+                // #.@OO.# -> #..@OO#
+                // #..@OO# -> #..@OO#
 
                 if (walls.contains(newBarrelPosition)) {
                     // nothing moves
@@ -90,8 +94,8 @@ public record WarehouseMap(Set<Coordinate> walls, Set<Coordinate> barrels, Robot
         var maxX = walls.stream().mapToInt(Coordinate::x).max().getAsInt() + 1;
         var maxY = walls.stream().mapToInt(Coordinate::y).max().getAsInt() + 1;
 
-        for (var y=0; y < maxY; y++) {
-            for (var x=0; x < maxX; x++) {
+        for (var y = 0; y < maxY; y++) {
+            for (var x = 0; x < maxX; x++) {
                 var coordinate = new Coordinate(x, y);
                 if (walls.contains(coordinate)) {
                     out.append('#');
@@ -109,11 +113,24 @@ public record WarehouseMap(Set<Coordinate> walls, Set<Coordinate> barrels, Robot
             }
             out.append('\n');
         }
-
         return out.toString();
     }
 
     public int gps() {
-        return barrels.stream().mapToInt(barrel -> 100*barrel.y() + barrel.x()).sum();
+        return barrels.stream().mapToInt(barrel -> 100 * barrel.y() + barrel.x()).sum();
+    }
+
+    public BigWarehouseMap embiggen() {
+        var bigWalls = walls.stream().flatMap(Coordinate::widen).collect(Collectors.toSet());
+        List<BigBox> bigBoxes = barrels.stream().map(BigBox::fromCoordinate).collect(Collectors.toList());
+        var bigAgent = agent.embiggen();
+
+        var boxMap = new HashMap<Coordinate, BigBox>();
+
+        for (var bigBox : bigBoxes) {
+            boxMap.put(bigBox.leftSide(), bigBox);
+            boxMap.put(bigBox.rightSide(), bigBox);
+        }
+        return new BigWarehouseMap(bigWalls, boxMap, bigAgent);
     }
 }

@@ -10,6 +10,11 @@ public class RobotAgent {
         this.position = position;
     }
 
+    public RobotAgent embiggen() {
+        var newPosition = new Coordinate(position.x()*2, position.y());
+        return new RobotAgent (newPosition);
+    }
+
     public Coordinate considerMove(Instruction instruction) {
         return instruction.move(position);
     }

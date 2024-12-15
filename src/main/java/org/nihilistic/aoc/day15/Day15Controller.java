@@ -32,12 +32,12 @@ public class Day15Controller {
     }
 
     @GetMapping("/day15/part2/{realm}")
-    public long execute2(@PathVariable Realm realm, @RequestParam Optional<String> override,
-            @RequestParam Optional<Integer> iterations, @RequestParam Optional<Integer> width,
-            @RequestParam Optional<Integer> height,
-            @RequestParam String output) throws IOException {
+    public long execute2(@PathVariable Realm realm, @RequestParam Optional<String> override) throws IOException {
         String input = inputService.getInput(15, realm, override);
+        var warehouse= Warehouse.fromString(input);
+        var bigWarehouse = warehouse.embiggen();
+        bigWarehouse.simulate();
 
-        return -1;
+        return bigWarehouse.gps();
     }
 }

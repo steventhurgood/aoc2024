@@ -29,5 +29,9 @@ public record Warehouse(WarehouseMap warehouseMap, Instructions instructions) {
     public String toString() {
         return warehouseMap.toString();
     }
-    
+   
+    public BigWarehouse embiggen() {
+        var bigMap = warehouseMap.embiggen();
+        return new BigWarehouse(bigMap, instructions);
+    }
 }
