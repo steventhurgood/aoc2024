@@ -29,7 +29,8 @@ public class Day13Controller {
 
     @GetMapping("/day13/part2/{realm}")
     public long execute2(@PathVariable Realm realm, @RequestParam Optional<String> override) throws IOException {
-        String input = inputService.getInput(12, realm, override);
-        return -1;
+        String input = inputService.getInput(13, realm, override);
+        var clawMachineStream = new ClawMachineStream(input);
+        return clawMachineStream.stream().map(ClawMachine::findLongPath).mapToLong(Long::valueOf).sum();
     }
 }

@@ -36,4 +36,17 @@ public class ClawMachineTests {
 
         assertThat(actual).isEqualTo(280);
     }
+
+    @Test
+    public void testClawMachine_whenFindLongPath_isCorrect() {
+        // arrange
+        var clawMachine = ClawMachine.fromString(input);
+
+        // act
+        var actual = clawMachine.findLongPath();
+
+        // assert
+
+        assertThat(actual).isEqualTo(280);
+    }
 }

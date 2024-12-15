@@ -84,7 +84,7 @@ public record ClawMachine(Coordinate buttonA, Coordinate buttonB, Coordinate pri
                 var tentativeScore = currentScore + aCost;
                 if (tentativeScore < aScore) {
                     // we have found a better path to moveA
-                    cameFrom.put(moveA, current);
+                    // cameFrom.put(moveA, current);
                     gScore.put(moveA, tentativeScore);
                     fScore.put(moveA, tentativeScore + heuristic(moveA));
                     if (!openSet.contains(moveA)) {
@@ -109,6 +109,60 @@ public record ClawMachine(Coordinate buttonA, Coordinate buttonB, Coordinate pri
                     }
                 }
             }
+        }
+        logger.warn("No way to win: " + this);
+        return 0L;
+    }
+
+    public Long findLongPath() {
+        var start = new Coordinate(0, 0);
+        var gScore = new HashMap<Coordinate, Long>();
+        gScore.put(start, 0L);
+        var fScore = new HashMap<Coordinate, Long>();
+        PriorityQueue<Coordinate> openSet = new PriorityQueue<Coordinate>((a, b) -> cmp(a, b, fScore));
+        openSet.add(start);
+        // var scaledPrize = prize.move(new Coordinate(10000000000000L, 10000000000000L));
+        var scaledPrize = prize;
+
+        fScore.put(start, heuristic(start));
+
+        while (!openSet.isEmpty()) {
+            Coordinate current = openSet.poll();
+
+            if (current.equals(scaledPrize)) {
+                return gScore.get(current);
+            }
+
+            // a neighbours
+            var currentScore = gScore.getOrDefault(current, Long.MAX_VALUE);
+
+            current.neighbours(buttonA, scaledPrize).forEach(press -> {
+                var neighbour = press.coordinate();
+                var aScore = gScore.getOrDefault(neighbour, Long.MAX_VALUE);
+                var tentativeScore = currentScore + press.pressCount() * aCost;
+                if (tentativeScore < aScore) {
+                    // we have found a better path to moveA
+                    // cameFrom.put(moveA, current);
+                    gScore.put(neighbour, tentativeScore);
+                    fScore.put(neighbour, tentativeScore + heuristic(neighbour));
+                    if (!openSet.contains(neighbour)) {
+                        openSet.add(neighbour);
+                    }
+                }
+            });
+
+            current.neighbours(buttonB, scaledPrize).forEach(press -> {
+                var neighbour = press.coordinate();
+                var bScore = gScore.getOrDefault(neighbour, Long.MAX_VALUE);
+                var tentativeScore = currentScore + press.pressCount() * aCost;
+                if (tentativeScore < bScore) {
+                    gScore.put(neighbour, tentativeScore);
+                    fScore.put(neighbour, tentativeScore + heuristic(neighbour));
+                    if (!openSet.contains(neighbour)) {
+                        openSet.add(neighbour);
+                    }
+                }
+            });
         }
         logger.warn("No way to win: " + this);
         return 0L;
