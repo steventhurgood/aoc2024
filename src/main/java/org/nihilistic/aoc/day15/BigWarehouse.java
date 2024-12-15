@@ -14,9 +14,7 @@ public record BigWarehouse (BigWarehouseMap warehouseMap, Instructions instructi
     public void simulate() {
         logger.info("\n" + warehouseMap.toString());
         for (Instruction instruction : instructions.instructions()) {
-            logger.info("Applying instruction: " + instruction);
             warehouseMap.apply(instruction);
-            logger.info("\n" + warehouseMap.toString());
         }
     }
 

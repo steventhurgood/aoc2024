@@ -104,17 +104,7 @@ public record BigWarehouseMap(Set<Coordinate> walls, Map<Coordinate, BigBox> box
     }
 
     public int gps() {
-        var gps = 0;
         var uniqueBoxes = Sets.newHashSet(boxes.values());
-        for (var box : uniqueBoxes) {
-            var xDistance = box.leftSide().x();
-            var yDistance = box.leftSide().y();
-
-            gps += (100*yDistance + xDistance);
-            logger.info("box: " + box + " [" + xDistance + "," + yDistance + "] (" + (100*yDistance + xDistance) + ")");
-            logger.info("gps: " + gps);
-        }
-
-        return gps;
+        return uniqueBoxes.stream().map(BigBox::leftSide).mapToInt(coordinate -> 100 * coordinate.y() + coordinate.x()).sum();
     }
 }

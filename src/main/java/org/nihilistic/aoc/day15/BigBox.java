@@ -25,17 +25,4 @@ public record BigBox(Coordinate leftSide) {
             instruction.move(rightSide())
         );
     }
-
-    public int horizontalDistanceToSide(int maxX) {
-        var leftDistance = leftSide.x();
-        var rightDistance = maxX - (leftDistance + 1);
-        return Math.min(leftDistance, rightDistance);
-    }
-
-    public int verticalDistanceToSide(int maxY) {
-        var topDistance = leftSide.y();
-        var bottomDistance = maxY - topDistance;
-        return Math.min(topDistance, bottomDistance);
-    }
-
 }
