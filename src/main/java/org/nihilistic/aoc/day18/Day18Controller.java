@@ -45,7 +45,7 @@ public class Day18Controller {
         if (realm.equals(Realm.TEST)) {
             end = new Coordinate(6, 6);
         }
-        return maze.findLeastBytesThatMakeMazeImpassible(start, end);
+        return maze.findLeastBytesThatMakeMazeImpassibleBinarySearch(start, end).get();
 
     }
 }

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.PriorityQueue;
 import java.util.Set;
@@ -18,6 +19,10 @@ public record MemoryMaze(List<Coordinate> corrupted) {
     public static MemoryMaze fromString(String input) {
         var corrupted = input.lines().map(Coordinate::fromString).toList();
         return new MemoryMaze(corrupted);
+    }
+
+    public boolean pathIsBlocked(Coordinate start, Coordinate end, int firstBytes) {
+        return findPath(start, end, firstBytes).isEmpty();
     }
 
     public OptionalInt findPath(Coordinate start, Coordinate end) {
@@ -91,9 +96,47 @@ public record MemoryMaze(List<Coordinate> corrupted) {
         }
         logger.info(current.toString());
     }
+    public Optional<Coordinate> findLeastBytesThatMakeMazeImpassibleBinarySearch(Coordinate start, Coordinate end) {
+        var alreadyCalculated = new HashMap<Integer, Boolean>();
+        // we need to find i such that findpath(..., i) succeeds but findpath(..., i+1) does not.
+        var left = 1;
+        var right = corrupted.size();
+        while (left <= right) {
+            // we know that right+1 is blocked, and left-1 is not
+            var middle = (left + right)/2;
+            if (middle >= corrupted.size() - 1) {
+                // all routes succeed
+                return Optional.empty();
+            }
+            var beforeMiddle = middle-1;
+
+            var middleBlocked = alreadyCalculated.computeIfAbsent(middle, key -> pathIsBlocked(start, end, middle));
+            var beforeMiddleBlocked = alreadyCalculated.computeIfAbsent(beforeMiddle, key -> pathIsBlocked(start, end, beforeMiddle));
+
+            if (!beforeMiddleBlocked && middleBlocked) {
+                /*
+                 * We have found what we want.
+                 * 
+                 * return the -1th item from the list, because if it is the nth
+                 * drop that blocks the maze, the that drop is at index n-1
+                 */
+                return Optional.of(corrupted.get(middle-1));
+            }
+            if (beforeMiddleBlocked && middleBlocked) {
+                // the target value is less than middle
+                right = middle-1;
+                continue;
+            }
+            if (!beforeMiddleBlocked && !middleBlocked) {
+                // the target value is greater than middle
+                left = middle+1;
+                continue;
+            }
+        }
+        return Optional.empty();
+    }
 
     public Coordinate findLeastBytesThatMakeMazeImpassible(Coordinate start, Coordinate end) {
-        // TODO: binary search
         // find i such that i is blocked, but i-1 is not
         for (var i=0; i < corrupted.size(); i++) {
             var pathLength = findPath(start, end, i);
