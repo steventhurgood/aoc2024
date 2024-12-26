@@ -2,94 +2,82 @@ package org.nihilistic.aoc.day11;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
-import com.google.common.collect.Lists;
-
-public record Blinker(List<Long> digits, BlinkCache cache) {
-
+public record Blinker(List<Long> numbers, Map<BlinkCacheKey, Long> cache) {
     public static Blinker fromString(String input) {
-        var digits = Arrays.stream(input.split(" ")).map(Long::valueOf).collect(Collectors.toList());
-        return new Blinker(digits, new BlinkCache());
+        var numbers = Arrays.stream(input.split(" ")).mapToLong(Long::valueOf).boxed().toList();
+        var cache = new HashMap<BlinkCacheKey, Long>();
+        return new Blinker(numbers, cache);
     }
 
-    public long countStones() {
+    public Long countStones() {
         return countStones(25);
     }
-
-    public long countStones(int blinksLeft) {
-        long sum = 0;
-        for (var digit : digits) {
-            sum += countBlinkedDigits(digit, blinksLeft);
+    public Long countStones(int blinksLeft) {
+        long total=0;
+        for (var number: numbers) {
+            total += countStones(number, blinksLeft);
         }
-        return sum;
+        return total;
     }
 
-    public long countStonesWithCaching(int blinksLeft) {
-        long sum = 0;
-        for (var digit : digits) {
-            var digits = blinkDigit(digit, blinksLeft);
-            sum += digits.size();
-        }
-        return sum;
-
-    }
-
-    public long countBlinkedDigits(Long n, int blinksLeft) {
+    public Long countStones(Long number, int blinksLeft) {
         if (blinksLeft == 0) {
-            return 1;
+            return 1L;
         }
-        if (n == 0) {
-            return countBlinkedDigits(1L, blinksLeft - 1);
+
+        var cacheKey = new BlinkCacheKey(number, blinksLeft);
+        if (cache.containsKey(cacheKey)) {
+            return cache.get(cacheKey);
         }
-        var digits = String.valueOf(n);
+
+        var numbers = blink(number);
+        long total=0;
+
+        for (var splitNumber: numbers) {
+            total += countStones(splitNumber, blinksLeft-1);
+        } 
+        cache.put(cacheKey, total);
+        return total;
+    }
+
+    public List<Long> blink(Long number) {
+        if (number == 0) {
+            return List.of(1L);
+        }
+
+        var digits = String.valueOf(number);
         if (digits.length() % 2 == 0) {
             var midPoint = digits.length() / 2;
             var left = Long.valueOf(digits.substring(0, midPoint));
             var right = Long.valueOf(digits.substring(midPoint, digits.length()));
-            return countBlinkedDigits(left, blinksLeft - 1) + countBlinkedDigits(right, blinksLeft - 1);
+            return List.of(left, right);
         }
-        return countBlinkedDigits(n * 2024, blinksLeft - 1);
-    }
-
-    public List<Long> blinkDigit(Long n, int blinksLeft) {
-        // have we blinked this digit before, and if so how many times?
-        if (blinksLeft == 0) {
-            return Lists.newArrayList(n);
-        }
-        // we have to process the number n, blinksLeft more times (eg., 10 more times).
-        // if we have already seen n some other number of times (say, 1,2,3,4,5,6) then we can
-        // fast foward the process by getting that list, and processing it (blinksLeft - maxCached) = 10-6 - 4 times.
-   
-        var cachedResult = cache.getMaxCachedValueUpTo(n, blinksLeft);
-        if (cachedResult.isPresent()) {
-            var result = new ArrayList<Long>();
-            var cachedBlinks = cachedResult.get().blinks();
-            for (var value : cachedResult.get().values()) {
-                result.addAll(blinkDigit(value, blinksLeft - cachedBlinks));
-            }
-            cache.put(n, blinksLeft, result);
-            return result;
-        }
-        if (n == 0) {
-            return blinkDigit(1L, blinksLeft - 1);
-        }
-        var digits = String.valueOf(n);
-        if (digits.length() % 2 == 0) {
-            var midPoint = digits.length() / 2;
-            var left = Long.valueOf(digits.substring(0, midPoint));
-            var right = Long.valueOf(digits.substring(midPoint, digits.length()));
-            var leftList = blinkDigit(left, blinksLeft - 1);
-            var rightList = blinkDigit(right, blinksLeft - 1);
-            List<Long> result = Lists.newArrayListWithCapacity(leftList.size() + rightList.size());
-            result.addAll(leftList);
-            result.addAll(rightList);
-            cache.put(n, blinksLeft, result);
-            return result;
-        }
-        var result = blinkDigit(n * 2024, blinksLeft - 1);
-        cache.put(n, blinksLeft, result);
-        return result;
+        return List.of(number * 2024);
     }
 }
+/*
+ * the pattern always goes
+ * 0
+ * 1
+ * 2024
+ * 20 24
+ * 2 0 2 4
+ * 4048 ...
+ * 40 48
+ * 4 0 4 8
+ * 8096 ...
+ * 80 96
+ * 8 0 9 6
+ * 16192 ...
+ * 32772608 ...
+ * 3277 2608 ...
+ * 32 77 26 08 ...
+ * 3 2 7 7 2 6 0 8
+ * 6072 ...
+ * 60 72 ...
+ * 6 0 7 2 ...
+ */
