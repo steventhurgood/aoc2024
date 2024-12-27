@@ -1,6 +1,7 @@
 package org.nihilistic.aoc.day13;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Optional;
 
 import org.nihilistic.aoc.InputService;
@@ -24,13 +25,21 @@ public class Day13Controller {
     public long execute1(@PathVariable Realm realm, @RequestParam Optional<String> override) throws IOException {
         String input = inputService.getInput(13, realm, override);
         var clawMachineStream = new ClawMachineStream(input);
-        return clawMachineStream.stream().map(ClawMachine::findPath).mapToLong(Long::valueOf).sum();
+        var cost = clawMachineStream.stream().map(ClawMachine::solve).filter(Optional::isPresent).mapToLong(Optional::get).sum();
+        return cost;
     }
 
     @GetMapping("/day13/part2/{realm}")
     public long execute2(@PathVariable Realm realm, @RequestParam Optional<String> override) throws IOException {
         String input = inputService.getInput(13, realm, override);
         var clawMachineStream = new ClawMachineStream(input);
-        return clawMachineStream.stream().map(ClawMachine::findLongPath).mapToLong(Long::valueOf).sum();
+        var costs = clawMachineStream.stream().map(ClawMachine::embiggen).map(ClawMachine::solve).toList();
+        long totalCost=0;
+        for (var cost : costs) {
+            var thisCost = cost.orElse(0L);
+            logger.info("" + thisCost);
+            totalCost += thisCost;
+        }
+        return totalCost;
     }
 }

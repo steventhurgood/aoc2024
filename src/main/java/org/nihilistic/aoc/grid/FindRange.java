@@ -8,10 +8,10 @@ import java.util.function.Supplier;
 import java.util.stream.Collector;
 
 public class FindRange implements Collector<Coordinate, FindRange, FindRange> {
-    public Integer minX = Integer.MAX_VALUE;
-    public Integer minY = Integer.MAX_VALUE;
-    public Integer maxX = Integer.MIN_VALUE;
-    public Integer maxY = Integer.MIN_VALUE;
+    public Long minX = Long.MAX_VALUE;
+    public Long minY = Long.MAX_VALUE;
+    public Long maxX = Long.MIN_VALUE;
+    public Long maxY = Long.MIN_VALUE;
 
     public void add(Coordinate coordinate) {
         minX = Math.min(minX, coordinate.x());
@@ -54,6 +54,4 @@ public class FindRange implements Collector<Coordinate, FindRange, FindRange> {
     public Supplier<FindRange> supplier() {
         return FindRange::new;
     }
-
-    
 }

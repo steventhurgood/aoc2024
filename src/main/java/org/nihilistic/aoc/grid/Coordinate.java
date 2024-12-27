@@ -2,7 +2,11 @@ package org.nihilistic.aoc.grid;
 
 import java.util.List;
 
-public record Coordinate(Integer x, Integer y) {
+public record Coordinate(Long x, Long y) {
+    public Coordinate(int x, int y) {
+        this((long)x, (long)y);
+    }
+
     public List<Coordinate> adjacent() {
         return List.of(
                 new Coordinate(x - 1, y),
