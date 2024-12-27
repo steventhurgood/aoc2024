@@ -1,12 +1,10 @@
-package org.nihilistic.aoc.day12;
+package org.nihilistic.aoc.grid;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
-public record Coordinate(int x, int y) {
-    List<Coordinate> adjacent() {
-        return Lists.newArrayList(
+public record Coordinate(Integer x, Integer y) {
+    public List<Coordinate> adjacent() {
+        return List.of(
                 new Coordinate(x - 1, y),
                 new Coordinate(x + 1, y),
                 new Coordinate(x, y - 1),

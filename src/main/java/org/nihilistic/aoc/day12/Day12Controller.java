@@ -31,6 +31,6 @@ public class Day12Controller {
     public long execute2(@PathVariable Realm realm, @RequestParam Optional<String> override) throws IOException {
         String input = inputService.getInput(12, realm, override);
         var garden = Garden.fromString(input);
-        return garden.fencingCost();
+        return garden.fencingCost2();
     }
 }
